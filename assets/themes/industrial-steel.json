@@ -1,0 +1,49 @@
+{
+  "$schema": "./theme.schema.json",
+  "id": "industrial-steel-flat",
+  "name": "Industrial Steel - Flat",
+  "version": 1,
+  "colors": {
+    "background": "#101216",
+    "surface": "#181B20",
+    "surfaceAlt": "#1F2329",
+    "border": "#2A2F37",
+    "borderStrong": "#3D434D",
+    "textPrimary": "#E8EBEF",
+    "textSecondary": "#A3ABB8",
+    "textDisabled": "#646C79",
+    "accent": "#38BDF8",
+    "accentSecondary": "#A855F7",
+    "warning": "#F5B54A",
+    "danger": "#F2545B",
+    "success": "#34D399",
+    "meterLow": "#34D399",
+    "meterMid": "#F5B54A",
+    "meterHigh": "#F2545B",
+    "meterBackground": "#0C0E11",
+    "grid": "#232830",
+    "knobBody": "#232830",
+    "knobRing": "#38BDF8",
+    "knobPrimary": "#38BDF8",
+    "knobSecondary": "#A855F7",
+    "selection": "#1B3038"
+  },
+  "geometry": {
+    "borderWidth": 1,
+    "cornerRadius": 0,
+    "slotHeight": 96,
+    "headerHeight": 52,
+    "knobSize": 44,
+    "meterSegments": 20
+  },
+  "typography": {
+    "uiFamily": "Inter",
+    "monoFamily": "JetBrains Mono",
+    "sizes": {
+      "small": 10,
+      "normal": 12,
+      "large": 15,
+      "mono": 11
+    }
+  }
+}

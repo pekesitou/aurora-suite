@@ -1,0 +1,49 @@
+{
+  "$schema": "./theme.schema.json",
+  "id": "dark-matter-flat",
+  "name": "Dark Matter - Flat",
+  "version": 1,
+  "colors": {
+    "background": "#0A0B0D",
+    "surface": "#14161B",
+    "surfaceAlt": "#1A1D24",
+    "border": "#22262E",
+    "borderStrong": "#333A45",
+    "textPrimary": "#E6EAF2",
+    "textSecondary": "#98A2B3",
+    "textDisabled": "#5A6373",
+    "accent": "#00E5FF",
+    "accentSecondary": "#8B5CF6",
+    "warning": "#FFB74D",
+    "danger": "#FF5370",
+    "success": "#2ED47A",
+    "meterLow": "#2ED47A",
+    "meterMid": "#FFB74D",
+    "meterHigh": "#FF5370",
+    "meterBackground": "#0F1115",
+    "grid": "#1E232C",
+    "knobBody": "#1A1E25",
+    "knobRing": "#00E5FF",
+    "knobPrimary": "#00E5FF",
+    "knobSecondary": "#8B5CF6",
+    "selection": "#123A45"
+  },
+  "geometry": {
+    "borderWidth": 1,
+    "cornerRadius": 2,
+    "slotHeight": 96,
+    "headerHeight": 52,
+    "knobSize": 44,
+    "meterSegments": 24
+  },
+  "typography": {
+    "uiFamily": "Inter",
+    "monoFamily": "JetBrains Mono",
+    "sizes": {
+      "small": 10,
+      "normal": 12,
+      "large": 15,
+      "mono": 11
+    }
+  }
+}

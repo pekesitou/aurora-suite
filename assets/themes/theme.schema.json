@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aurora-engine.local/schemas/theme.schema.json",
+  "title": "AURORA ENGINE flat theme",
+  "description": "Tema plano para AURORA ENGINE. No admite degradados, texturas ni sombras: solo colores solidos, geometria entera y tipografia embebida.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "version", "colors", "geometry", "typography"],
+  "properties": {
+    "$schema": {
+      "description": "Referencia opcional al esquema, relativa a este archivo.",
+      "const": "./theme.schema.json"
+    },
+    "id": {
+      "description": "Identificador estable usado por ThemeManager y por uiThemeId en el estado.",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 48,
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "description": "Nombre visible en el selector de temas.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "version": {
+      "description": "Version del formato de tema. La version 1 es la base.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "colors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "background",
+        "surface",
+        "surfaceAlt",
+        "border",
+        "borderStrong",
+        "textPrimary",
+        "textSecondary",
+        "textDisabled",
+        "accent",
+        "accentSecondary",
+        "warning",
+        "danger",
+        "success",
+        "meterLow",
+        "meterMid",
+        "meterHigh",
+        "meterBackground",
+        "grid",
+        "knobBody",
+        "knobRing",
+        "knobPrimary",
+        "knobSecondary",
+        "selection"
+      ],
+      "properties": {
+        "background": { "$ref": "#/$defs/hexColour" },
+        "surface": { "$ref": "#/$defs/hexColour" },
+        "surfaceAlt": { "$ref": "#/$defs/hexColour" },
+        "border": { "$ref": "#/$defs/hexColour" },
+        "borderStrong": { "$ref": "#/$defs/hexColour" },
+        "textPrimary": { "$ref": "#/$defs/hexColour" },
+        "textSecondary": { "$ref": "#/$defs/hexColour" },
+        "textDisabled": { "$ref": "#/$defs/hexColour" },
+        "accent": { "$ref": "#/$defs/hexColour" },
+        "accentSecondary": { "$ref": "#/$defs/hexColour" },
+        "warning": { "$ref": "#/$defs/hexColour" },
+        "danger": { "$ref": "#/$defs/hexColour" },
+        "success": { "$ref": "#/$defs/hexColour" },
+        "meterLow": { "$ref": "#/$defs/hexColour" },
+        "meterMid": { "$ref": "#/$defs/hexColour" },
+        "meterHigh": { "$ref": "#/$defs/hexColour" },
+        "meterBackground": { "$ref": "#/$defs/hexColour" },
+        "grid": { "$ref": "#/$defs/hexColour" },
+        "knobBody": { "$ref": "#/$defs/hexColour" },
+        "knobRing": { "$ref": "#/$defs/hexColour" },
+        "knobPrimary": { "$ref": "#/$defs/hexColour" },
+        "knobSecondary": { "$ref": "#/$defs/hexColour" },
+        "selection": { "$ref": "#/$defs/hexColour" }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["borderWidth", "cornerRadius", "slotHeight", "headerHeight", "knobSize", "meterSegments"],
+      "properties": {
+        "borderWidth": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "cornerRadius": { "type": "integer", "minimum": 0, "maximum": 12 },
+        "slotHeight": { "type": "integer", "minimum": 64, "maximum": 160 },
+        "headerHeight": { "type": "integer", "minimum": 32, "maximum": 96 },
+        "knobSize": { "type": "integer", "minimum": 24, "maximum": 96 },
+        "meterSegments": { "type": "integer", "minimum": 8, "maximum": 64 }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uiFamily", "monoFamily", "sizes"],
+      "properties": {
+        "uiFamily": {
+          "description": "Familia de UI embebida en AuroraAssets. No se admiten fuentes externas en los temas de fabrica.",
+          "const": "Inter"
+        },
+        "monoFamily": {
+          "description": "Familia monoespaciada tabular embebida en AuroraAssets.",
+          "const": "JetBrains Mono"
+        },
+        "sizes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["small", "normal", "large", "mono"],
+          "properties": {
+            "small": { "type": "number", "minimum": 8, "maximum": 24 },
+            "normal": { "type": "number", "minimum": 8, "maximum": 28 },
+            "large": { "type": "number", "minimum": 8, "maximum": 40 },
+            "mono": { "type": "number", "minimum": 8, "maximum": 24 }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hexColour": {
+      "description": "Color RGB opaco en notacion hexadecimal #RRGGBB. Se prohiben alfa y formatos cortos.",
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    }
+  }
+}

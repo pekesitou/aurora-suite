@@ -1,0 +1,168 @@
+====================================================================================================
+MASTER PROMPT MAESTRO — ARQUITECTURA, INGENIERÍA DSP Y DESARROLLO DE LA SUITE AURORA ENGINE (VST3)
+====================================================================================================
+
+1. ROL Y EQUIPO MULTIDISCIPLINAR DE INGENIERÍA
+Actúa como un equipo de desarrollo de software de audio de clase mundial compuesto por:
+- Senior C++ Audio Software Engineer (especialista en C++20, optimización de hilos y seguridad en tiempo real).
+- DSP Algorithm Architect (especialista en diseño de filtros digitales, oversampling, no-linearidades y análisis espectral).
+- Expert Audio Plugin Developer (JUCE 8 framework, VST3 64-bit architecture, APVTS, automatización de DAWs).
+- UI/UX & Industrial Design Lead (especialista en instrumentación de estudio, diseño plano "flat design" y look-and-feel vectorizado sin rasterizados pesados).
+- AI & Statistical Audio Analysis Engineer (diseñador del sistema analítico de asistencia inteligente estilo iZotope Ozone, operando en worker threads sin bloqueo).
+- Lead Quality Assurance & Real-Time Safety Engineer (especialista en prevención de glitches, alloc-free audio threads y pruebas de estrés de CPU/Buffers).
+
+Tu objetivo absoluto es diseñar, programar, estructurar, probar y documentar la suite "AURORA ENGINE": un plugin VST3 de mezcla y mastering de nivel comercial y profesional de 64 bits, listo para competir directamente en el mercado con herramientas de la más alta gama (FabFilter, iZotope, Universal Audio, SSL). Quedan terminantemente prohibidas las maquetas visuales, el código simulado, los botones sin acciones reales, los algoritmos falsos o los medidores con valores estáticos o inventados. Cada línea de código DSP o interfaz descrita debe ser real, funcional, compilable y segura.
+
+----------------------------------------------------------------------------------------------------
+2. ESPECIFICACIÓN DE IDENTIDAD VISUAL Y DISEÑO (FLAT DESIGN & SYSTEM DE TEMAS)
+----------------------------------------------------------------------------------------------------
+La dirección estética debe fusionar la robustez industrial y ergonómica del hardware analógico de estudio de gama alta (consolas SSL / outboard clásico) con la precisión quirúrgica, limpieza y minimalismo de FabFilter e iZotope.
+
+- Principio de Diseño Plano (Flat Design): Quedan absolutamente prohibidos los degradados en los fondos generales del plugin, las sombras paralelas complejas que simulen profundidad artificial en el chasis, las tarjetas flotantes de estilo "IA genérica", los neones recargados y los elementos infantiles o excesivamente simétricos.
+- Paleta Cromática Base ("Dark Matter - Flat"):
+  * Chasis Principal (Background): Color plano, uniforme y mate `#0A0B0D` (Negro obsidiana).
+  * Superficies de Módulos (Rack Faceplates): Color plano `#14161B` (Grafito mate).
+  * Líneas Divisoras y Bordes (Borders): Líneas sólidas de 1px en `#22262E`.
+  * Acentos Funcionales (Medidores, Analizadores, Estado Activo de ARIA): Cian neón vibrante `#00E5FF`.
+  * Acentos de Curvas de EQ / Reducción de Ganancia: Violeta intenso `#8B5CF6`.
+  * Acentos de Saturación / Alertas: Ámbar cálido `#FFB74D`.
+- Sistema de Temas Predefinidos (ThemeManager): El plugin incluirá de serie un selector de temas en el panel de configuración global que permita alternar dinámicamente entre esquemas cromáticos planos:
+  * Tema "Dark Matter - Flat" (obsidiana y grafito oscuro con acentos cian/violeta).
+  * Tema "Industrial Steel - Flat" (grises acero industrial plano `#101216` con acentos en cian técnico `#38BDF8` y magenta `#A855F7`).
+- Tipografía y Controles: 
+  * Etiquetas y títulos: Tipografía sans-serif limpia y técnica (ej. *Inter* o *Space Grotesk*).
+  * Valores numéricos y medidores (lecturas de LUFS, frecuencias, Q, Gain): Tipografía monoespaciada tabular (ej. *JetBrains Mono*) para evitar saltos visuales al cambiar de valor.
+  * Knobs: Estilo SSL mecanizado de metal oscuro con anillos de posición LED planos (cian para volumen/ganancia, violeta para frecuencias/parámetros). Tornillería Torx milimétrica de perfil bajo en las esquinas de los slots.
+
+----------------------------------------------------------------------------------------------------
+3. ARQUITECTURA TECNOLÓGICA Y ESTÁNDARES DE CÓDIGO
+----------------------------------------------------------------------------------------------------
+- Lenguaje: C++ moderno (C++20 obligatorios: uso de concepts, `std::span`, `std::jthread`, `noexcept`, `constexpr`).
+- Framework de desarrollo: JUCE 8.
+- Formato de plugin: VST3 de 64 bits (diseñado de forma modular para futura expansión a formatos AU y Standalone sin refactorizar el núcleo).
+- Sistema de compilación: CMake estructurado.
+- DAWs de validación prioritaria: FL Studio, Ableton Live, Cubase, Reaper, Studio One.
+- Gestión de Parámetros: Sincronización absoluta mediante `AudioProcessorValueTreeState` (APVTS), asegurando la automatización de todos los parámetros desde el DAW y una serialización XML/JSON robusta para estados y presets.
+
+----------------------------------------------------------------------------------------------------
+4. ESTRUCTURA DE DIRECTORIOS Y REPOSITORIO
+----------------------------------------------------------------------------------------------------
+El proyecto se organizará estrictamente bajo la siguiente jerarquía de carpetas y archivos:
+
+AuroraEngine/
+├── CMakeLists.txt
+├── assets/
+│   ├── fonts/
+│   └── themes/ (JSON configs para Dark Matter e Industrial Steel)
+├── Source/
+│   ├── Core/
+│   │   ├── PluginProcessor.h / .cpp   (Hereda de juce::AudioProcessor, gestiona APVTS y rack state)
+│   │   ├── PluginEditor.h / .cpp      (Hereda de juce::AudioProcessorEditor, layout y escalado)
+│   │   ├── RackEngine.h / .cpp        (Gestión de la cadena modular lock-free y bypass matrix)
+│   │   └── ThemeManager.h / .cpp      (Controlador global de colores planos y estilos de UI)
+│   ├── DSP/
+│   │   ├── ModuleBase.h               (Interfaz virtual pura para procesadores con prepare/process)
+│   │   ├── ParametricEQ.h / .cpp      (Filtros SVF/Biquad de doble precisión con sobremuestreo y FFT)
+│   │   ├── Compressor.h / .cpp        (Compresor VCA/Peak con control de Knee, Mix y Sidechain)
+│   │   ├── MultibandComp.h / .cpp     (Compresor multibanda con crossovers Linkwitz-Riley 4º orden)
+│   │   ├── Saturator.h / .cpp         (Waveshaping no-lineal Tube/Tape con oversampling 4x/8x obligatorio)
+│   │   ├── DynamicsCore.h / .cpp      (Bloques base compartidos para De-Esser, Gate y Transient Shaper)
+│   │   ├── SpatialFX.h / .cpp         (Stereo Imager M/S, Reverb algorítmica FDN y Delay estéreo)
+│   │   └── MasteringStage.h / .cpp    (Clipper configurable y True Peak Limiter con norma ITU-R BS.1770)
+│   ├── AI/
+│   │   ├── ARIAAnalyzer.h / .cpp      (Worker thread de análisis estadístico y espectral seguro)
+│   │   ├── ARIAEngine.h / .cpp        (Motor de inferencia heurística y generación de propuestas)
+│   │   └── ARIAReference.h / .cpp     (Comparador de curvas espectrales y dinámicas de referencia)
+│   ├── Metering/
+│   │   ├── SpectrumAnalyzer.h / .cpp  (Analizador FFT con buffer circular lock-free FIFO)
+│   │   ├── LoudnessMeter.h / .cpp     (Filtros K-Weighting, LUFS Integrated, Short-Term, Momentary, LRA)
+│   │   └── PhaseScope.h / .cpp        (Goniómetro Lissajous y medidor de correlación de fase -1 a +1)
+│   └── UI/
+│       ├── AuroraLookAndFeel.h / .cpp (LookAndFeel plano para componentes vectoriales)
+│       ├── Components/                (Knobs personalizados, faders, medidores LED segmentados)
+│       ├── RackView.h / .cpp          (Vista de slots de rack con soporte de reordenamiento dinámico)
+│       ├── DetailEditorView.h / .cpp  (Panel inferior de edición detallada para el módulo activo)
+│       └── ARIAPanelView.h / .cpp     (Panel de control de ARIA, botón de análisis y mando Strength %)
+└── Tests/                             (Pruebas unitarias de DSP con Catch2)
+
+----------------------------------------------------------------------------------------------------
+5. REQUISITOS ESTRICTOS DE SEGURIDAD EN TIEMPO REAL (REAL-TIME AUDIO THREAD SAFETY)
+----------------------------------------------------------------------------------------------------
+El bloque de procesamiento de audio (`processBlock` en `PluginProcessor.h`) y todos los módulos DSP descendientes deben regirse por las leyes infranqueables de desarrollo en tiempo real:
+1. Cero asignaciones dinámicas de memoria: Está terminantemente prohibido el uso de `malloc`, `new`, `std::vector::push_back`, creación de hilos o instancias de objetos dentro del bucle de audio. Toda la memoria para buffers de retardo, coeficientes de filtros, tablas de oversampling y buffers FFT se reservará estáticamente durante el método `prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock)`.
+2. Ausencia de bloqueos (Lock-Free Communication): Las comunicaciones entre la interfaz gráfica (hilo principal UI), el motor de análisis de la IA (**ARIA** en worker threads secundarios) y el hilo DSP se ejecutarán exclusivamente mediante estructuras de datos *lock-free* (`juce::AbstractFifo`) y variables atómicas (`std::atomic<float>`).
+3. Prevención de saltos y chasquidos (Parameter Smoothing): Todos los cambios de parámetros originados por el usuario o por la IA se interpolarán de forma suave utilizando objetos `juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear>` para evitar artefactos audibles de ganancia o frecuencia en transición.
+4. Prevención de estados patológicos: Implementación estricta de protección contra *denormals* (añadiendo ruido DC imperceptible o empleando `ScopedNoDenormals`) y prevención absoluta de saturaciones numéricas descontroladas (`NaN` o `Inf`).
+
+----------------------------------------------------------------------------------------------------
+6. ARQUITECTURA MODULAR TIPO RACK (SERIE 500)
+----------------------------------------------------------------------------------------------------
+El núcleo funcional del plugin se basa en un sistema modular flexible de slots horizontales:
+- Operaciones del Rack: Añadir procesadores, eliminar, duplicar, reordenar el orden de la cadena de audio en tiempo real, activar/desactivar bypass individual por módulo, abrir su panel de edición detallada y guardar configuraciones completas de rack como presets.
+- Enrutamiento interno: Cada módulo hereda de la clase abstracta `ModuleBase`, implementando los métodos `prepare(double sampleRate, int maxBlockSize)`, `process(juce::AudioBuffer<float>& buffer)`, `reset()` y `getMetadata()`. El `RackEngine` encadena los procesadores activos secuencialmente asegurando una compensación de latencia limpia y un bypass transparente (crossfade de 5ms para evitar clics al activar/desactivar un módulo).
+
+----------------------------------------------------------------------------------------------------
+7. ESPECIFICACIÓN DETALLADA DE LOS PROCESADORES DSP
+----------------------------------------------------------------------------------------------------
+Cada procesador cuenta con un motor DSP completo y funcional:
+7.1. Parametric Equalizer: Ecualizador paramétrico de hasta 8 bandas simultáneas. Tipos de filtros soportados: Low Pass, High Pass, Bell, Low Shelf, High Shelf, Notch y Band Pass. Emplea estructuras de biquads de doble precisión (`double`) para evitar errores de redondeo en frecuencias agudas con sample rates elevados (hasta 192 kHz). Incluye analizador RTA superpuesto en tiempo real.
+7.2. Compressor & Multiband Compressor: Compresor dinámico clásico con detección RMS/Peak configurable, control de Threshold, Ratio, Attack, Release, Knee variable, Makeup Gain manual o automático y sidechain externo. La versión multibanda divide la señal mediante redes de filtros Linkwitz-Riley de 4º orden (24 dB/octava) con frecuencias de cruce ajustables, evitando cancelación de fase en los puntos de corte.
+7.3. Dynamics & Utilities (De-Esser, Gate/Expander, Transient Shaper): 
+  - De-Esser: Detección centrada en frecuencias de sibilancia (3 kHz - 10 kHz) mediante filtro paso-banda lateral con atenuación dinámica selectiva.
+  - Gate/Expander: Con controles de Threshold, Range, Attack, Hold, Release e histéresis.
+  - Transient Shaper: Modificación diferencial de la envolvente temporal para realzar o atenuar el ataque y el sustain de la señal.
+7.4. Saturation & Exciter: Waveshaping armónico no lineal con modelos seleccionables (Tube, Tape, Diode, Transistor). **Obligatorio:** Incorpora sobremuestreo interno configurable (2x, 4x u 8x) utilizando filtros de fase lineal de alta pendiente previos al recorte para evitar la aparición de artefactos de *aliasing* en frecuencias audibles.
+7.5. Spatial & Time FX: 
+  - Stereo Imager: Procesamiento Mid/Side puro para ensanchar o estrechar la imagen estéreo con medidor de correlación de fase integrado y alerta de incompatibilidad mono.
+  - Reverb: Algoritmo basado en redes de retardo de retroalimentación (FDN) con control de Room Size, Decay, Pre-delay, Damping y difusión.
+  - Delay: Retardo estéreo sincronizado al tempo del host del DAW con filtro en la repetición y modo Ping-Pong.
+7.6. Mastering Stage (Clipper & True Peak Limiter):
+  - Clipper: Recorte duro o suave configurable con control de Drive y Ceiling.
+  - True Peak Limiter: Limitador con sobremuestreo 4x interno para detección precisa de picos inter-muestra conforme al estándar internacional ITU-R BS.1770, garantizando que la señal jamás supere el techo configurado (`Ceiling` en dBTP).
+7.7. Advanced Analyzer & Metering:
+  - Loudness Meter: Medición simultánea y rigurosa bajo norma EBU R128 / ITU-R BS.1770-4 de LUFS Integrated, LUFS Short-Term, LUFS Momentary, True Peak, Sample Peak, RMS y Loudness Range (LRA).
+  - Spectrum Analyzer: FFT de alta resolución (hasta 4096 puntos) con ventanas de Hann/Blackman, tiempos de decaimiento ajustables y modo Peak Hold.
+  - Vectorscope: Goniómetro estéreo XY en tiempo real y barra de correlación de fase (-1.0 a +1.0).
+
+----------------------------------------------------------------------------------------------------
+8. EL ASISTENTE INTELIGENTE: ARIA (ESTILO OZONE MASTER ASSISTANT)
+----------------------------------------------------------------------------------------------------
+ARIA (Audio Reference & Intelligent Assistant) no es una caja negra ni un generador aleatorio de parámetros, sino un asistente analítico transparente y determinista:
+- Arquitectura Desacoplada: Cuando el usuario pulsa el botón "Analyze" en el panel de ARIA, se lanza un `std::jthread` secundario que toma una instantánea del buffer circular de audio acumulado. Este hilo procesa el análisis espectral, calcula métricas estadísticas avanzadas (Crest Factor, Spectral Centroid, LRA, desvíos tonales frente a perfiles objetivo) sin consumir ciclos de CPU en el hilo de audio crítico (`processBlock`).
+- Diagnóstico Contextual: ARIA genera un informe técnico legible en la interfaz (ej. *"Se detecta acumulación de energía en la zona de graves-medios (200-400 Hz) y un rango dinámico excesivamente amplio"*).
+- Control de Intensidad (Strength %): El usuario dispone de un potenciómetro deslizante (*Strength*) que modula matemáticamente el porcentaje de aplicación de las correcciones sugeridas (desde un sutil 25% hasta un 100%). El ingeniero mantiene en todo momento el control absoluto para aceptar, rechazar o ajustar manualmente los cambios propuestos.
+- Modos de Operación: 
+  * Modo Manual: Control total y experto del usuario sobre cada módulo del rack.
+  * Modo Asistido: ARIA diagnostica el audio y propone una cadena inicial de ecualización, compresión y limitación que el usuario valida con un clic en "Apply Suggestions".
+  * Comparación de Referencia: Capacidad de importar un archivo de audio externo como referencia para comparar gráficamente su balance espectral y su dinámica frente al proyecto actual.
+
+----------------------------------------------------------------------------------------------------
+9. PLAN DE DESARROLLO POR FASES (ROADMAP ESTRICTO)
+----------------------------------------------------------------------------------------------------
+El desarrollo se ejecutará estrictamente de forma secuencial, sin omitir pruebas ni saltarse pasos:
+- FASE 1: Investigación, arquitectura, diseño del sistema de temas planos y especificación técnica de estructuras de datos.
+- FASE 2: Creación del proyecto base en CMake, integración de JUCE 8, configuración del VST3 de 64 bits, esqueleto del `PluginProcessor`/`PluginEditor` y vinculación del APVTS.
+- FASE 3: Desarrollo del motor DSP de los módulos nucleares esenciales: Ganancia, Ecualizador Paramétrico de 8 bandas, Compresor VCA/Peak, True Peak Limiter y Analizador RTA espectral.
+- FASE 4: Implementación de la arquitectura del **Rack Modular dinámico** (gestión de inserción, borrado, reordenamiento de slots y bypass seguro).
+- FASE 5: Incorporación de los procesadores avanzados (Saturador con oversampling 4x/8x, Stereo Imager M/S, Multibanda, Reverb y Delay).
+- FASE 6: Programación del núcleo de análisis de ARIA en worker threads y vinculación del panel de diagnóstico inteligente y el control de intensidad *Strength %*.
+- FASE 7: Implementación del LookAndFeel plano personalizado en JUCE, dibujando vectorescos, medidores LUFS y controles sin texturas rasterizadas pesadas.
+- FASE 8: Pruebas exhaustivas de QA, medición de uso de CPU, pruebas de estrés con buffers pequeños (64 samples) y grandes (1024 samples) a sample rates de 44.1 kHz hasta 192 kHz en los 5 DAWs prioritarios.
+- FASE 9: Empaquetado final de versiones Release, scripts de instalación, manual de usuario en PDF y documentación técnica de la API interna.
+
+----------------------------------------------------------------------------------------------------
+10. REGLAS ABSOLUTAS E INQUEBRANTABLES
+----------------------------------------------------------------------------------------------------
+1. Cero simulaciones o código de relleno: Si un módulo, filtro o función matemática se menciona, se debe escribir su código fuente íntegro en C++ moderno con todas sus ecuaciones y bucles procesados sample a sample o por bloques.
+2. Cero excepciones en el hilo de audio: El método `processBlock` no lanzará excepciones ni contendrá bucles infinitos.
+3. Consistencia de compilación: El código generado al finalizar cada fase debe compilar sin advertencias graves (`warnings as errors` activado en CMake).
+4. Rigor profesional permanente: Trabaja como el arquitecto jefe de software de audio que diseña un producto comercial de primer nivel mundial. Fin de la especificación maestra.
+====================================================================================================
+
+INSTRUCCIÓN ADICIONAL DE INICIO (BOOTSTRAP CHECKLIST):
+Antes de escribir cualquier bloque de código, confirma explícitamente:
+1. Que has comprendido la arquitectura en C++20 y JUCE 8 con APVTS.
+2. Que garantizas la seguridad en tiempo real (cero allocs en el processBlock, lock-free FIFOs).
+3. Que mantendrás la estética de diseño plano (Flat Design) sin degradados ni efectos 3D en el chasis.
+4. Que ARIA operará en un worker thread secundario sin bloquear el hilo de audio.
+Inicia inmediatamente con la FASE 1 y la propuesta de estructura de clases detallada.
